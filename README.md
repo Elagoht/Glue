@@ -41,4 +41,4 @@ AnonymousAnonymoussons    Anon    Tails OS        anonym@anonym.io
 
 # Installation
 
-
+Simply run `./install.sh` with root privileges and follow the instruction.
