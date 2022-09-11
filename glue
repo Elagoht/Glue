@@ -1,0 +1,138 @@
+#!/bin/env python3
+from os import listdir, access, W_OK, F_OK, R_OK, path, getcwd
+from sys import argv, exit, stderr
+from getopt import getopt, GetoptError
+
+# Define color prints
+def red_text(text): return f"\033[91m{text}\033[00m"
+
+# Print error
+def eprint(*args, **kwargs):
+    print(*args, file=stderr, **kwargs)
+
+# Get command line arguments
+try:
+    opts,args=getopt(argv[1:],"hys:j:",["help","y-axis","separator=","justify="])
+except GetoptError as err:
+    eprint(err)
+    exit(2)
+opts=dict((opt[0],opt[1]) for opt in opts)
+optk=opts.keys()
+
+# Print help dialog and exit
+if "-h" in optk or "--help" in optk:
+    print("""Paste files together with glue. This program lets you to put file lines together and to set justify text. Also you can set a separator.
+Usage:
+    glue [OPTIONS] [INPUT FILES]
+    glue [OPTIONS] [INPUT FILES] > [OUTPUT FILE]
+
+Options:
+    -h       , --help            : Print this help document and exit.
+    -s [SPR] , --separator=[SPR] : Use this delimiter to split files.
+    -j [DIR] , --justify=[DIR]   : Justify text. 0 is left, 1 is center, 2 is right.
+    -y       , --y-axis          : Merge files in y axis.
+
+Notes:
+    * Justify option can only take 0, 1 and 2 values.
+        Any other options will be ignored.
+    * Do not select the output file from the input file.
+
+Exit Codes:
+      0 : Program done it's job successfully.
+      1 : An error occurred.
+    126 : File permission denied. Check file permissions.
+    130 : Process terminated by user.
+""")
+    exit(0)
+
+# If no file given, exit
+if len(args)==0:
+    eprint(red_text("No files given, exiting."))
+    exit(1)
+
+# Required variables
+files={}
+lengths={}
+
+# Get files
+for num,file in enumerate(args):
+
+    # Check if file exists
+    if not access(file,F_OK):
+        eprint(red_text(f"The file '{file}' is not exists"))
+        exit(126)
+    else:
+
+        # Check if file readable
+        if not access(file,R_OK):
+            eprint(red_text(f"The file '{file}' cannot read. Check your permissions."))
+            exit(126)
+        else:
+
+            # Get file contents and lengths
+             with open(file,"r") as target:
+                 files[num]=target.read().split("\n")[:-1]
+                 lengths[num]=len(files[num])
+
+# Get justify direction
+direction=opts["--justify"] if "--justify" in optk else opts["-j"] if "-j" in optk else 0
+
+# Set justify function
+def justify(inp:str,amount:int)->str:
+    if direction=="1": return inp.center(amount)
+    elif direction=="2": return inp.rjust(amount)
+    else: return inp.ljust(amount)
+
+# Get max lengths of lines
+maxlen=max(map(len,files.values()))
+
+# If program will work in y axis
+if "-y" in optk or "--y-axis" in optk:
+     
+    for i in range(maxlen):
+        
+        # Get max line length
+        linelen=0
+        for file in files.values():
+            try:
+                linelen=max(len(file[i]),linelen)
+            except IndexError:
+                pass
+
+        # Lenghten lines to maximum
+        for num,file in files.items():
+            try:
+                files[num][i]=justify(file[i],linelen)
+            except IndexError:
+                files[num].append(justify("",linelen))
+
+# If program won't work in y axis
+else:
+    for num,file in files.items():
+        try:
+            linelen=max(map(len,file))
+        except ValueError:
+            linelen=0
+        for line in range(len(file)):
+            files[num][line]=justify(files[num][line],linelen)
+        while len(file)<maxlen:
+            file.append(justify("",linelen))
+            
+# Write Output
+# If program will work in y axis
+if "-y" in optk or "--y-axis" in optk:
+    for file in files.values():
+        for num,col in enumerate(file):
+            if num!=len(file)-1:
+                print(col,end=opts["-s"] if "-s" in optk else opts["--separator"] if "--separator" in optk else "  ")
+            else:
+                print(col)
+
+# If program won't work in y axis
+else:
+    for row in range(maxlen):
+        for num,file in enumerate(files.values()):
+            if num!=len(files.values())-1:
+                print(file[row],end=opts["-s"] if "-s" in optk else opts["--separator"] if "--separator" in optk else "  ")
+            else:
+                print(file[row])
