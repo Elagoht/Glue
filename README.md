@@ -1,12 +1,12 @@
 # Glue
 
-# Installation
-
-Simply run `./install.sh` with root privileges and follow the instruction.
-
 A program that allows you merge your files side by side or line by line. Actually, `paste` command does this, right? Yes, but `glue` respects line lengths, do not separate them via tab spaces unlike the command `paste`. 
 
 Glue also lets you to justify text and to set a separator between texts.
+
+# Installation
+
+Simply run `./install.sh` with root privileges and follow the instruction.
 
 # Help Page
 
