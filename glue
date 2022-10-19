@@ -127,6 +127,7 @@ if "-y" in optk or "--y-axis" in optk:
                 print(col,end=opts["-s"] if "-s" in optk else opts["--separator"] if "--separator" in optk else "  ")
             else:
                 print(col)
+            exit(0)
 
 # If program won't work in y axis
 else:
@@ -136,3 +137,4 @@ else:
                 print(file[row],end=opts["-s"] if "-s" in optk else opts["--separator"] if "--separator" in optk else "  ")
             else:
                 print(file[row])
+            exit(0)
