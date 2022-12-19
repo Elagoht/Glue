@@ -1,5 +1,8 @@
 # Glue
 
+![Python](https://shields.io/badge/Python-App-3776AB?logo=python&logoColor=white&style=for-the-badge)
+![Shell](https://shields.io/badge/Terminal-Tool-A42E2B?logo=gnubash&logoColor=white&style=for-the-badge)
+
 A program that allows you merge your files side by side or line by line. Actually, `paste` command does this, right? Yes, but `glue` respects line lengths, do not separate them via tab spaces unlike the command `paste`. 
 
 Glue also lets you to justify text and to set a separator between texts.
